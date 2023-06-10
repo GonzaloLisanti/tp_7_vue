@@ -4,7 +4,7 @@
       <div class="col-12 col-md-8 text-center">
         <h1>{{ instrumento.instrumento }}</h1>
         <img
-          :src="`/img/${instrumento.imagen}`"
+          :src="urlImage"
           :alt="instrumento.instrumento"
           class="img-fluid mb-4"
         />
@@ -29,29 +29,41 @@
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 
 export default {
   name: "DetalleInstrumento",
   setup() {
     const instrumento = ref(null);
+    const urlImage = ref("");
+
     const router = useRouter();
     const route = useRoute();
-    const id = route.params.id;
+    const id = parseInt(route.params.id); // Convertir id a número
 
     onMounted(() => {
-      fetch("http://localhost:8080/api/instrumentos/${id}")
+      fetch(`http://localhost:8081/api/instrumentos/${id}`)
         .then((response) => response.json())
         .then((data) => {
-          const instrumentoData = data.instrumentos.find((i) => i.id === id);
-          instrumento.value = instrumentoData;
+          instrumento.value = data; // Asignar directamente el objeto de instrumento devuelto por la API
         })
         .catch((error) => console.error(error));
     });
 
+    watch(instrumento, (newValue) => {
+      if (newValue) {
+        if (String(newValue.imagen).indexOf("http") >= 0) {
+          urlImage.value = newValue.imagen;
+        } else {
+          urlImage.value = `/img/${newValue.imagen}`;
+        }
+      }
+    });
+
     return {
       instrumento,
+      urlImage,
     };
   },
 };

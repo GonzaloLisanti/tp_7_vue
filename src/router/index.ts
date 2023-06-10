@@ -20,7 +20,7 @@ const routes: Array<RouteRecordRaw> = [
   }
   ,
   {
-    path: '/productos/:id',
+    path: '/instrumentos/:id',
     name: 'detalle-instrumento',
     component: () => import('../components/DetalleInstrumento.vue')
   }
